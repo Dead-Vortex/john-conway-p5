@@ -1,7 +1,7 @@
 let grid;
 let cols;
 let rows;
-let resolution = 15; // Size of each cell
+let resolution = 30; // Size of each cell
 let speed = 30; // Amount of frames until next step
 
 function setup() {
@@ -9,8 +9,8 @@ function setup() {
   cols = floor(width / resolution - 2);
   rows = floor(height / resolution - 1);
 
-  // cols = 5;
-  // rows = 5;
+  //cols = 10;
+  //rows = 10;
 
   grid = make2DArray(cols, rows);
   randomizeGrid();
@@ -20,16 +20,26 @@ function draw() {
   background(240); // Light gray background
 
   drawGrid(grid);
-  grid = updateGrid(grid);
+  if(frameCount % speed == 0) {
+    grid = updateGrid(grid);
+  }
 }
 
 function updateGrid(g) {
   let bufferGrid = g;
   for(let i = 0; i < g.length; i++) {
-    for(let j = 0; j < g[i].length; i++) {
-      if((countNeighbors(g, i, j) < 2 && g[i][j] == 1) || (countNeighbors(g, i, j) > 3 && g[i][j] == 1)) {
+    for(let j = 0; j < g[i].length; j++) {
+      let neighbors = countNeighbors(g, i, j);
+      if(neighbors < 2 && g[i][j] == 1) {
         bufferGrid[i][j] = 0;
-      } else if(countNeighbors(g, i, j) == 3 && g[i][j] == 0) {
+      }
+      if((neighbors == 2 || neighbors == 3) && g[i][j] == 1) {
+        bufferGrid[i][j] = 1;
+      }
+      if(neighbors > 3 && g[i][j] == 1) {
+        bufferGrid[i][j] = 0;
+      }
+      if((neighbors == 3) && g[i][j] == 0) {
         bufferGrid[i][j] = 1;
       }
     }
@@ -41,9 +51,9 @@ function drawGrid(g) {
   for(let i = 0; i < g.length; i++) {
     for(let j = 0; j < g[i].length; j++) {
       if(g[i][j] == 0) {
-        fill("black");
-      } else {
         fill("white");
+      } else {
+        fill("black");
       }
       rect((i + 1) * resolution, (j + 1) * resolution, resolution, resolution);
     }
@@ -88,7 +98,18 @@ function randomizeGrid() {
   }
 }
 
-function countNeighbors(grid, x, y) {
+function countNeighbors(g, x, y) {
   let neighbors = 0;
+  for(let i = x - 1; i <= x + 1; i++) {
+    for(let j = y - 1; j <= y + 1; j++) {
+      if(i >= 0 && j >= 0) {
+        if(i < g.length && j < g[i].length) {
+          if(g[i][j] == 1 && !(i == x && j == y)) {
+            neighbors++;
+          }
+        }
+      }
+    }
+  }
   return neighbors;
 }
