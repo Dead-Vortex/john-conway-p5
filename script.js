@@ -92,6 +92,10 @@ function keyPressed() {
     speed++;
   } else if(keyCode == 32) {
     paused = !paused;
+  } else if(key == "c") {
+    grid = make2DArray(cols, rows);
+  } else if(key == "r") {
+    randomizeGrid();
   }
 }
 
